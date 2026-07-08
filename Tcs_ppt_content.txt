@@ -1,0 +1,559 @@
+For a **TCS internship presentation**, the slide should not read like a research paper. It should **highlight measurable achievements, engineering insights, observed limitations and the optimization roadmap**. Here's a stronger, data-driven version.
+
+---
+
+# **Outcome & Learnings**
+
+## **Performance Evaluation & Key Outcomes**
+
+### **Comprehensive Evaluation**
+
+* Evaluated **2 real-time multilingual speech AI pipelines** over **35 clinical conversations** (English, Hindi & Hinglish) covering **7 cardiovascular healthcare scenarios**, including routine consultations, medication counselling and emergency situations. 
+* Conducted **both objective (latency, throughput, WER, CER, RTF)** and **subjective (response quality, empathy, human-likeness and clinical appropriateness)** evaluations to benchmark end-to-end system behaviour. 
+
+---
+
+### **Major Quantitative Findings**
+
+**Pipeline 1 (Whisper + Nemotron)**
+
+* Achieved **~41% lower Unified Processing Latency** (**5.04 s vs 8.62 s**) owing to highly optimized specialized ASR and LLM modules.
+* Delivered **~79% higher text generation throughput** (**24.53 vs 13.73 tokens/s**) and **over 4× faster audio ingestion** (**173.5 vs 40.8 audio tokens/s**), enabling significantly faster response generation.
+* However, cascaded processing caused **acoustic error propagation**, where medical transcription mistakes directly degraded downstream reasoning (e.g., ECG→ICP, Clopidogrel→"clubby dog rhythm"), leading to clinically unsafe responses in several cases. 
+
+**Pipeline 2 (Gemma Audio)**
+
+* Reduced overall transcription errors with **~23% lower average WER** (**16.7% vs 21.6%**) through joint speech understanding and reasoning.
+* Produced noticeably **more empathetic, context-aware and clinically safer responses**, particularly during emergency and medication-related conversations.
+* The trade-off was **~75% higher processing latency**, primarily due to multimodal audio encoding and blocking XML-tag based response generation, making Time-To-First-Audio unsuitable for low-latency clinical deployment. 
+
+---
+
+## **Critical Engineering Observations**
+
+* **Pipeline 1:** Faster execution but vulnerable to **cascade failures**, where a single ASR error propagated throughout the reasoning pipeline and compromised clinical accuracy.
+* **Pipeline 2:** Better reasoning and emotional interaction, but suffered from **multimodal inference overhead** and **streaming bottlenecks**, delaying speech synthesis despite earlier completion of meaningful response tokens.
+* Hindi/Hinglish conversations exposed additional challenges including **medical terminology recognition**, **cross-lingual language switching**, and **response truncation**, highlighting the complexity of multilingual healthcare AI. 
+
+---
+
+## **Optimization Strategies Proposed (Ongoing Work)**
+
+* **Pipeline 1**
+
+  * Medical vocabulary biasing and semantic correction layer between ASR and LLM.
+  * Confidence-aware transcript refinement to prevent clinical error propagation.
+
+* **Pipeline 2**
+
+  * Asynchronous token-stream parsing to remove XML/tag blocking and enable real-time TTS streaming.
+  * Target TTFA reduction from **~8.8 s to <1.5 s** while preserving multimodal reasoning quality.
+
+---
+
+## **Key Learnings**
+
+* Learnt the practical trade-offs between **modular cascaded architectures** and **native multimodal AI systems**.
+* Gained hands-on experience with **speech AI pipelines, multilingual ASR, LLM orchestration, latency profiling, performance benchmarking and subjective AI evaluation**.
+* Understood that for healthcare conversational AI, **clinical safety, robustness and response quality are often more critical than raw inference speed**, motivating future research on hybrid architectures that combine the strengths of both approaches.
+
+---
+
+This version is more aligned with what interviewers and research mentors at **TCS Research** expect: it emphasizes **measurable achievements, engineering analysis, system-level insights, and future optimization**, rather than simply listing observations.
+
+Based on your reports and the complete evaluation results, I would make this presentation **industry-oriented rather than academic**. TCS reviewers generally want to know:
+
+* What problem was assigned?
+* What methodology did you follow?
+* What engineering decisions did you make?
+* What measurable outcomes did you achieve?
+* What did you learn?
+
+Avoid putting huge paragraphs on slides. Put concise bullets and explain them verbally.
+
+---
+
+# Slide 1 : PROJECT DETAILS
+
+## Project Title
+
+**Benchmarking and Evaluation of State-of-the-Art Speech AI Frameworks for a Multilingual Cardiovascular Conversational Agent**
+
+---
+
+## Objective
+
+Develop a detailed evaluation framework for modern Speech AI architectures suitable for deployment in a real-time cardiovascular conversational assistant.
+
+The study focused on identifying an architecture capable of:
+
+* Real-time edge deployment
+* Multilingual communication (English, Hindi, Hinglish, future Indian languages)
+* High ASR accuracy under noisy and clinically challenging conditions
+* Natural, empathetic doctor–patient conversations
+* Clinically safe response generation
+* Low-latency streaming interaction
+
+---
+
+## High-Level Approach
+
+```
+Understand project requirements
+                │
+                ▼
+Literature Survey of SOTA Speech AI
+(B1 Cascaded + B2 End-to-End)
+                │
+                ▼
+Compare architectures
+Capabilities
+Limitations
+Datasets
+Evaluation Metrics
+Deployment Feasibility
+                │
+                ▼
+Design candidate pipelines
+                │
+                ▼
+Implement two baseline systems
+                │
+                ▼
+Evaluate on multilingual cardiovascular conversations
+                │
+                ▼
+Analyze latency, ASR quality,
+clinical safety,
+empathy,
+human-likeness
+                │
+                ▼
+Recommend optimized deployment architecture
+```
+
+---
+
+# Slide 2 : IMPLEMENTATION FRAMEWORK
+
+## Proposed Solution
+
+Designed and benchmarked two Speech AI pipelines for multilingual cardiovascular conversational assistants.
+
+### Pipeline 1 (Cascaded)
+
+```
+Speech Input
+      │
+Silero VAD
+      │
+Whisper Large-v3 Turbo
+      │
+Nemotron-4B Hindi Mini
+      │
+Coqui XTTS-v2
+      │
+Speech Output
+```
+
+Focus
+
+* Low latency
+* Modular architecture
+* Edge deployable
+* Easier debugging
+
+---
+
+### Pipeline 2 (Semi-End-to-End)
+
+```
+Speech Input
+      │
+Silero VAD
+      │
+Gemma Audio
+(Transcription + Reasoning)
+      │
+Coqui XTTS-v2
+      │
+Speech Output
+```
+
+Focus
+
+* Better contextual understanding
+* Improved empathy
+* Stronger multilingual reasoning
+* Better clinical response quality
+
+---
+
+## Tools & Technologies Used
+
+### Speech Processing
+
+* Silero VAD
+* Whisper Large-v3 Turbo
+* Gemma Audio
+* Coqui XTTS-v2
+
+### Language Models
+
+* NVIDIA Nemotron-4B Hindi Mini
+* Gemma Audio
+
+### Frameworks
+
+* PyTorch
+* HuggingFace Transformers
+* Python
+* CUDA
+* Conda
+
+### Evaluation
+
+* Word Error Rate (WER)
+* Character Error Rate (CER)
+* TTFA
+* Unified Processing Latency
+* Response Quality Assessment
+* Clinical Safety Analysis
+* Empathy Assessment
+* Human-likeness Evaluation
+
+---
+
+## Methodologies Applied
+
+* Extensive literature survey of SOTA Speech AI systems
+* Comparative benchmarking
+* Objective performance evaluation
+* Subjective response quality analysis
+* Error propagation analysis
+* Clinical safety evaluation
+* Latency profiling
+* Architecture optimization study
+* Engineering recommendation for edge deployment
+
+---
+
+# Slide 3 : OUTCOME & LEARNINGS
+
+## Impact / Results Achieved
+
+### Literature Survey
+
+* Surveyed **8+ State-of-the-Art Speech AI frameworks**
+* Studied both Cascaded and End-to-End SpeechLM architectures
+* Compared deployment feasibility for healthcare applications
+
+---
+
+### Experimental Evaluation
+
+Designed evaluation using
+
+* **35 multilingual conversations**
+* **7 clinical scenarios**
+* English + Hindi
+* Medication counselling
+* Emergency cardiac situations
+* Medical terminology stress testing
+* Emotional patient interactions
+
+---
+
+### Objective Benchmarking
+
+Generated comparison using
+
+* WER
+* CER
+* TTFA
+* Unified Processing Latency
+* Audio ingestion rate
+* Token generation rate
+* RTF
+* CPS
+
+More than **15 objective performance metrics** were analyzed across both pipelines. 
+
+---
+
+### Major Findings
+
+Pipeline 1
+
+* Lower average Unified Processing Latency
+
+**≈ 5.04 sec**
+
+* Faster Time-To-First-Audio
+
+**≈ 4.67 sec**
+
+* Better edge responsiveness
+
+However,
+
+* Significant ASR error propagation
+* Medical terminology corruption
+* Unsafe reasoning in some clinical cases
+
+---
+
+Pipeline 2
+
+* Lower average WER
+
+**16.7% vs 21.6%**
+
+* Better contextual reasoning
+* Stronger empathy
+* Better multilingual understanding
+* More clinically appropriate responses
+
+However,
+
+* Higher latency
+
+Average UPL
+
+**≈ 8.62 sec**
+
+---
+
+### Engineering Outcome
+
+Based on benchmarking,
+
+recommended deployment strategy was
+
+**Hybrid Cascaded Architecture**
+
+using
+
+NeMo Streaming + Whisper + Lightweight Medical LLM + XTTS
+
+for Phase-1 edge deployment,
+
+while recommending End-to-End SpeechLMs as future direction after latency optimization.
+
+---
+
+## Key Learnings & Skills Gained
+
+* Speech AI system design
+* ASR benchmarking methodologies
+* SpeechLM architectures
+* Clinical conversational AI
+* Edge AI deployment considerations
+* NVIDIA NeMo ecosystem
+* Whisper optimization
+* Multilingual speech processing
+* Latency profiling
+* Clinical safety evaluation
+* Technical literature review
+* Research-driven engineering
+
+---
+
+## Future Scope
+
+* Streaming Whisper implementation
+* Medical vocabulary biasing
+* Clinical Guardrails
+* Better Hinglish support
+* Speaker emotion recognition
+* Noise & respiratory event robustness
+* Streaming SpeechLM optimization
+* Reduced TTFA using asynchronous token streaming
+* Edge model quantization
+
+---
+
+# Slide 4 : MOST MEMORABLE MOMENT
+
+## Most Memorable Moment During Internship
+
+On the very first day of the internship, I was introduced to the Speech AI domain and assigned the responsibility of researching State-of-the-Art multilingual ASR and Speech Language Models for healthcare applications. Since this was my first exposure to Speech AI and conversational voice systems, the problem initially seemed challenging.
+
+Over the following weeks, I independently explored research papers, GitHub repositories, technical documentation, benchmarking methodologies, and deployment architectures to understand how modern Speech AI systems operate. This journey gradually transformed an unfamiliar topic into one of my strongest learning experiences during the internship.
+
+What made the experience particularly memorable was realizing how research, engineering, and real-world healthcare requirements come together while designing AI systems intended for actual patient–doctor interactions. The opportunity to independently analyze, compare, and recommend production-ready architectures significantly strengthened my confidence in approaching new research problems and translating them into practical engineering solutions.
+
+For a PPT, I recommend **Napkin AI flow diagrams** rather than complex architecture diagrams. They look professional and are easy to explain in 1–2 minutes. Below are two compact diagrams that fit side-by-side or one below another on a single slide.
+
+---
+
+# Pipeline 1 – Cascaded Speech AI Framework (Current Prototype)
+
+Copy directly into Napkin AI.
+
+```text
+Patient/Doctor Speech
+        │
+        ▼
+Silero VAD
+(Removes silence and detects speech segments)
+        │
+        ▼
+Whisper Large-v3 Turbo
+Speech → Text
+(Language Detection + Medical ASR)
+        │
+        ▼
+Nemotron-4B Hindi Mini
+Medical Conversation Reasoning
+• Understand query
+• Generate response
+• Clinical guidance
+        │
+        ▼
+Coqui XTTS-v2
+Text → Natural Speech
+(Language-aware Voice Synthesis)
+        │
+        ▼
+Multilingual Spoken Response
+```
+
+### Small note beside diagram
+
+**Advantages**
+
+* Low latency
+* Modular
+* Easy debugging
+* Edge deployable
+
+**Limitations**
+
+* ASR errors propagate to LLM
+* Medical terminology corruption possible
+
+---
+
+# Pipeline 2 – Semi-End-to-End SpeechLM Framework
+
+```text
+Patient/Doctor Speech
+        │
+        ▼
+Silero VAD
+(Removes silence)
+        │
+        ▼
+Gemma Audio SpeechLM
+Unified Processing
+• Speech Understanding
+• Speech → Text
+• Context Reasoning
+• Response Generation
+        │
+        ▼
+Regex Parser
+(Extract Transcript & Response)
+        │
+        ▼
+Coqui XTTS-v2
+Text → Natural Speech
+        │
+        ▼
+Multilingual Spoken Response
+```
+
+### Small note beside diagram
+
+**Advantages**
+
+* Better context understanding
+* Higher empathy
+* Better multilingual reasoning
+* Better clinical safety
+
+**Limitations**
+
+* Higher latency
+* Streaming blocked by structured output
+
+---
+
+## Even Better (Cleaner) Version for TCS PPT
+
+If you want it to look more "corporate", use this format instead.
+
+### Pipeline 1
+
+```text
+Speech
+   │
+   ▼
+Voice Activity Detection
+(Silero)
+   │
+   ▼
+Automatic Speech Recognition
+(Whisper Large-v3 Turbo)
+   │
+   ▼
+Medical Language Model
+(Nemotron-4B Hindi Mini)
+   │
+   ▼
+Speech Synthesis
+(Coqui XTTS-v2)
+   │
+   ▼
+Speech Response
+```
+
+---
+
+### Pipeline 2
+
+```text
+Speech
+   │
+   ▼
+Voice Activity Detection
+(Silero)
+   │
+   ▼
+Unified SpeechLM
+(Gemma Audio)
+ASR + Reasoning + Response
+   │
+   ▼
+Output Parsing
+(Response Extraction)
+   │
+   ▼
+Speech Synthesis
+(Coqui XTTS-v2)
+   │
+   ▼
+Speech Response
+```
+
+---
+
+### My recommendation for the slide
+
+Arrange Slide 2 like this:
+
+```
+--------------------------------------------------------
+IMPLEMENTATION FRAMEWORK
+
+Left (45%)                     Right (55%)
+
+Tools & Technologies           Pipeline 1 Diagram
+
+Methodologies                  Pipeline 2 Diagram
+--------------------------------------------------------
+```
+
+This layout is clean, readable, and looks like the kind of architecture slide commonly used in industry presentations.
+
